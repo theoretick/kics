@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	"github.com/Checkmarx/kics/pkg/model"
@@ -22,31 +21,11 @@ type FilesystemSource struct {
 	Types  []string
 }
 
-const (
-	// QueryFileName The default query file name
-	QueryFileName = "query.rego"
-	// MetadataFileName The default metadata file name
-	MetadataFileName = "metadata.json"
-	// LibraryFileName The default library file name
-	LibraryFileName = "library.rego"
-	// LibrariesDefaultBasePath the path to rego libraries
-	LibrariesDefaultBasePath = "./assets/libraries/"
-)
-
-var (
-	supportedPlatforms = map[string]string{
-		"Ansible":        "ansible",
-		"CloudFormation": "cloudformation",
-		"Dockerfile":     "dockerfile",
-		"Kubernetes":     "k8s",
-		"Terraform":      "terraform",
-		"OpenAPI":        "openapi",
-	}
-)
-
 // NewFilesystemSource initializes a NewFilesystemSource with source to queries and types of queries to load
 func NewFilesystemSource(source string, types []string) *FilesystemSource {
 	log.Debug().Msg("source.NewFilesystemSource()")
+
+	GetQueries()
 
 	if len(types) == 0 {
 		types = []string{""}
@@ -55,18 +34,6 @@ func NewFilesystemSource(source string, types []string) *FilesystemSource {
 		Source: filepath.FromSlash(source),
 		Types:  types,
 	}
-}
-
-// ListSupportedPlatforms returns a list of supported platforms
-func ListSupportedPlatforms() []string {
-	keys := make([]string, len(supportedPlatforms))
-	i := 0
-	for k := range supportedPlatforms {
-		keys[i] = k
-		i++
-	}
-	sort.Strings(keys)
-	return keys
 }
 
 // GetPathToLibrary returns the libraries path for a given platform
